@@ -65,11 +65,6 @@ IF "%1"=="--publicip" (
     set PUBLIC_IP=%2
     SHIFT
 )
-if "%1"=="--no-turn" (
-    set NO_TURN=1
-    shift
-    goto :arg_loop
-)
 IF "%1"=="--turn" (
     set HANDLED=1
     set TURN_SERVER=%2
@@ -82,6 +77,14 @@ IF "%1"=="--turn-user" (
 IF "%1"=="--turn-pass" (
     set HANDLED=1
     set TURN_PASS=1
+)
+if "%1"=="--no-turn" (
+    set HANDLED=1
+    set NO_TURN=1
+    set START_TURN=0
+    set TURN_SERVER=
+    set TURN_USER=
+    set TURN_PASS=
 )
 if "%1"=="--start-turn" (
     set HANDLED=1
@@ -277,7 +280,14 @@ call :SetupCoturn
 exit /b
 
 :SetPublicIP
-FOR /f %%A IN ('curl --silent http://api.ipify.org') DO set PUBLIC_IP=%%A
+set PUBLIC_IP=
+for /f "tokens=*" %%a in ('curl --silent --max-time 3 http://api.ipify.org 2^>^nul') do (
+    set PUBLIC_IP=%%a
+)
+if "%PUBLIC_IP%"=="" (
+    echo Warning: Failed to get public IP, using 127.0.0.1
+    set PUBLIC_IP=127.0.0.1
+)
 Echo External IP is : %PUBLIC_IP%
 exit /b
 

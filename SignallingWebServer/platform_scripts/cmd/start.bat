@@ -17,14 +17,21 @@ call :SetupTurnStun bg
 
 set PEER_OPTIONS=
 set SERVER_ARGS=!SERVER_ARGS! --serve --console_messages verbose --https_redirect --log_config --public_ip=!PUBLIC_IP!
-IF NOT "!STUN_SERVER!"=="" (
-	IF NOT "!TURN_SERVER!"=="" (
-		set PEER_OPTIONS={\"iceServers\":[{\"urls\":[\"stun:!STUN_SERVER!\",\"turn:!TURN_SERVER!\"],\"username\":\"!TURN_USER!\",\"credential\":\"!TURN_PASS!\"}]}
-	) ELSE (
-		set PEER_OPTIONS={\"iceServers\":[{\"urls\":[\"stun:!STUN_SERVER!\"]}]}
-	)
-) ELSE IF NOT "!TURN_SERVER!"=="" (
-	set PEER_OPTIONS={\"iceServers\":[{\"urls\":[\"turn:!TURN_SERVER!\"],\"username\":\"!TURN_USER!\",\"credentials\":\"!TURN_PASS!\"}]}
+
+IF "!NO_TURN!"=="1" (
+    IF NOT "!STUN_SERVER!"=="" (
+        set PEER_OPTIONS={\"iceServers\":[{\"urls\":[\"stun:!STUN_SERVER!\"]}]}
+    )
+) ELSE (
+    IF NOT "!STUN_SERVER!"=="" (
+        IF NOT "!TURN_SERVER!"=="" (
+            set PEER_OPTIONS={\"iceServers\":[{\"urls\":[\"stun:!STUN_SERVER!\",\"turn:!TURN_SERVER!\"],\"username\":\"!TURN_USER!\",\"credential\":\"!TURN_PASS!\"}]}
+        ) ELSE (
+            set PEER_OPTIONS={\"iceServers\":[{\"urls\":[\"stun:!STUN_SERVER!\"]}]}
+        )
+    ) ELSE IF NOT "!TURN_SERVER!"=="" (
+        set PEER_OPTIONS={\"iceServers\":[{\"urls\":[\"turn:!TURN_SERVER!\"],\"username\":\"!TURN_USER!\",\"credentials\":\"!TURN_PASS!\"}]}
+    )
 )
 
 echo !SERVER_ARGS! | findstr /C:"--peer_options" >nul
