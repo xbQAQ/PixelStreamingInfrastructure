@@ -65,6 +65,11 @@ IF "%1"=="--publicip" (
     set PUBLIC_IP=%2
     SHIFT
 )
+if "%1"=="--no-turn" (
+    set NO_TURN=1
+    shift
+    goto :arg_loop
+)
 IF "%1"=="--turn" (
     set HANDLED=1
     set TURN_SERVER=%2
@@ -277,6 +282,12 @@ Echo External IP is : %PUBLIC_IP%
 exit /b
 
 :SetupTurnStun
+if "%START_TURN%"=="1" (
+    if not defined TURN_SERVER (
+        echo "TURN server disabled by --no-turn"
+        exit /b
+    )
+)
 IF "%TURN_SERVER%"=="" (
     set TURN_SERVER=%PUBLIC_IP%:19303
     set TURN_USER=PixelStreamingUser
