@@ -9,6 +9,7 @@ set SCRIPT_DIR=%~dp0
 set /p NODE_VERSION=<"%SCRIPT_DIR%/../../../NODE_VERSION"
 set NPM="%SCRIPT_DIR%/node/npm"
 set TAR="%SystemRoot%\System32\tar.exe"
+set CONTINUE=1
 GOTO :eof
 
 :Usage
@@ -280,7 +281,6 @@ call :SetupCoturn
 exit /b
 
 :SetPublicIP
-set PUBLIC_IP=
 for /f "tokens=*" %%a in ('curl --silent --max-time 3 http://api.ipify.org 2^>^nul') do (
     set PUBLIC_IP=%%a
 )
