@@ -1,9 +1,14 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { App } from './components/App';
+import ReactDOM from 'react-dom/client';
+import { CustomPlayerPage } from './pages/CustomPlayerPage';
 
-document.body.onload = function () {
-    // Attach the React app root component to document.body
-    createRoot(document.body).render(<App />);
-};
+const root = ReactDOM.createRoot(
+    document.getElementById('root') as HTMLElement
+);
+
+root.render(
+    <React.StrictMode>
+        <CustomPlayerPage />
+    </React.StrictMode>
+);
