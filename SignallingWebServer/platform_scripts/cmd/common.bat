@@ -9,6 +9,7 @@ set SCRIPT_DIR=%~dp0
 set /p NODE_VERSION=<"%SCRIPT_DIR%/../../../NODE_VERSION"
 set NPM="%SCRIPT_DIR%/node/npm"
 set TAR="%SystemRoot%\System32\tar.exe"
+set CONTINUE=1
 GOTO :eof
 
 :Usage
@@ -77,6 +78,14 @@ IF "%1"=="--turn-user" (
 IF "%1"=="--turn-pass" (
     set HANDLED=1
     set TURN_PASS=1
+)
+if "%1"=="--no-turn" (
+    set HANDLED=1
+    set NO_TURN=1
+    set START_TURN=0
+    set TURN_SERVER=
+    set TURN_USER=
+    set TURN_PASS=
 )
 if "%1"=="--start-turn" (
     set HANDLED=1
@@ -272,11 +281,23 @@ call :SetupCoturn
 exit /b
 
 :SetPublicIP
-FOR /f %%A IN ('curl --silent http://api.ipify.org') DO set PUBLIC_IP=%%A
+for /f "tokens=*" %%a in ('curl --silent --max-time 3 http://api.ipify.org 2^>^nul') do (
+    set PUBLIC_IP=%%a
+)
+if "%PUBLIC_IP%"=="" (
+    echo Warning: Failed to get public IP, using 127.0.0.1
+    set PUBLIC_IP=127.0.0.1
+)
 Echo External IP is : %PUBLIC_IP%
 exit /b
 
 :SetupTurnStun
+if "%START_TURN%"=="1" (
+    if not defined TURN_SERVER (
+        echo "TURN server disabled by --no-turn"
+        exit /b
+    )
+)
 IF "%TURN_SERVER%"=="" (
     set TURN_SERVER=%PUBLIC_IP%:19303
     set TURN_USER=PixelStreamingUser
